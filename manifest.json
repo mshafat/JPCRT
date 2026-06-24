@@ -1,0 +1,17 @@
+{
+  "short_name": "Jamat Tracking",
+  "name": "Jama'at Phone Call & Report Tracking System",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2920/2920265.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#1b365d",
+  "theme_color": "#1b365d",
+  "display": "standalone",
+  "orientation": "portrait"
+}
