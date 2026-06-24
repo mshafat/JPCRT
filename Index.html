@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jama'at Phone Call & Report Tracking System v4.2.1</title>
+    <style>
+        :root {
+            --primary: #1b365d;
+            --secondary: #4a5568;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --border: #cbd5e1;
+            --today-color: #2b6cb0; 
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f1f5f9; color: #334155; padding: 12px; }
+        .container { max-width: 1450px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 20px; font-size: 20px; border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
+        .version-tag { font-size: 11px; color: #718096; text-align: center; margin-top: -15px; margin-bottom: 20px; font-weight: bold;}
+        
+        .section { background: var(--light); padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .section-title { font-weight: bold; color: var(--primary); display: flex; justify-content: space-between; align-items: center; font-size: 14px; flex-wrap: wrap; gap: 10px; }
+        
+        /* Accordion Style */
+        .accordion-header { cursor: pointer; user-select: none; padding: 12px 15px; background: #eafeea; border: 1px solid #bdf1bd; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #1e4620; font-size: 13px; }
+        .accordion-content { display: none; background: var(--light); padding: 15px; border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; margin-top: -21px; margin-bottom: 20px; }
+        
+        /* Unified Sticky Controller Container */
+        .sticky-wrapper {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 5px;
+            z-index: 999;
+            background: #fcfcfc;
+            box-shadow: 0 10px 25px -5px rgba(27, 54, 93, 0.3);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 12px;
+        }
+        .sticky-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sticky-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 10px 0;
+        }
+
+        .flex-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .form-control { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 12px; font-weight: 600; color: var(--secondary); }
+        input, select, textarea { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: white; width: 100%;}
+        
+        textarea { min-height: 55px; resize: none; overflow-y: hidden; line-height: 1.5; }
+        
+        /* Button Styles and Fixes */
+        .btn { padding: 8px 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; transition: all 0.2s; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: #212529; }
+        .btn-info { background: var(--info); color: white; }
+        
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--secondary); }
+        
+        /* Text Color Lock on Selection/Active state */
+        .btn-outline.active, .btn-outline:active, .btn-outline:focus { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; outline: none; }
+        .btn-outline.btn-today { border-color: var(--today-color); color: var(--today-color); }
+        .btn-outline.btn-today.active, .btn-outline.btn-today:active, .btn-outline.btn-today:focus { background: var(--today-color) !important; border-color: var(--today-color) !important; color: white !important; outline: none; }
+        
+        .btn-sm { padding: 6px 10px; font-size: 12px; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-outline:disabled { background: #e2e8f0; color: #a0aec0; border-color: #cbd5e1; cursor: not-allowed; transform: none; opacity: 0.7; }
+
+        /* Arrow Navigation Controller */
+        .nav-arrow-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .nav-arrow-btn:hover { background: #2c4d7c; }
+
+        .checkbox-container { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: bold; color: var(--primary); background: #e2e8f0; padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-top: 15px;}
+        .checkbox-container input { width: 16px; height: 16px; cursor: pointer; }
+
+        /* KPI Layout Design */
+        .kpi-container { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .kpi-card { background: white; padding: 12px; border-radius: 8px; border-left: 5px solid var(--primary); box-shadow: 0 2px 4px rgb(0 0 0 / 0.05); text-align: center; }
+        .kpi-card.success { border-left-color: var(--success); }
+        .kpi-card.danger { border-left-color: var(--danger); }
+        .kpi-card.warning { border-left-color: var(--warning); }
+        .kpi-card.info { border-left-color: var(--info); }
+        .kpi-num { font-size: 18px; font-weight: bold; margin-top: 5px; }
+        .kpi-title { font-size: 11px; font-weight: 600; color: var(--secondary); }
+
+        /* Compact Inline Filter Card inside Sticky Wrapper */
+        .sticky-filter-card {
+            background: #e2e8f0;
+            padding: 4px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 13px;
+        }
+
+        /* Print Specific Filter Status Block */
+        .print-filter-info-block {
+            display: none;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: inset 3px 0 0 var(--primary);
+        }
+
+        .mapping-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        .table-responsive { overflow-x: auto; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th, td { padding: 12px 14px; border: 1px solid var(--border); vertical-align: top; }
+        th { background: var(--primary); color: white; font-weight: 600; text-align: center; }
+        tr:nth-child(even) { background: #f8fafc; }
+        
+        .contact-info-block { line-height: 1.6; font-size: 13.5px; color: #1e293b; white-space: pre-line; word-break: break-word; }
+        .status-select { font-weight: bold; padding: 6px; border-radius: 4px; width: 100%;}
+        .status-select:disabled { background: #e2e8f0; color: #718096; cursor: not-allowed; opacity: 0.8; }
+        
+        .log-container { font-size: 11px; color: #4a5568; line-height: 1.4; text-align: left; max-height: 65px; overflow-y: auto; background: #fff; padding: 4px; border: 1px dashed #cbd5e1; border-radius: 4px; margin-top: 4px;}
+        .log-item { border-bottom: 1px solid #edf2f7; padding: 2px 0; }
+        .log-item:last-child { border-bottom: none; }
+        
+        .edit-time-box { display: inline-flex; align-items: center; gap: 4px; margin-top: 5px; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold;}
+        
+        .received-date-lbl { font-size: 11px; font-weight: bold; color: var(--success); margin-top: 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; width: 100%; }
+        .print-received-date { display: none; font-size: 11px; font-weight: bold; color: #111; margin-top: 5px; text-align: center; }
+
+        /* Mobile View - Card Layout Container */
+        .mobile-cards-container { display: none; flex-direction: column; gap: 15px; margin-top: 10px; }
+        .mobile-card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .mobile-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #edf2f7; }
+        .mobile-card-id { background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .mobile-card-title { font-size: 15px; font-weight: bold; color: var(--primary); }
+        .mobile-field-group { margin-bottom: 12px; }
+        .mobile-field-label { font-size: 11px; font-weight: bold; color: #718096; margin-bottom: 4px; display: block;}
+        .mobile-status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+
+        /* Modal Style */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 9999; padding: 15px; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 100%; max-width: 340px; text-align: left; }
+        .modal-content h3 { font-size: 15px; margin-bottom: 15px; color: var(--primary); text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 8px;}
+        .time-picker-12h { display: flex; gap: 6px; margin-top: 5px; margin-bottom: 15px; }
+        .time-picker-12h select { flex: 1; padding: 8px 4px; text-align: center; font-weight: bold;}
+
+        /* Print Elements Configuration */
+        .print-status-text { display: none; font-weight: bold; font-size: 13px; text-align: center; width: 100%; }
+        .print-remarks-text { display: none; font-size: 13.5px; line-height: 1.4; word-break: break-word; white-space: pre-line; }
+
+        /* 📱 Responsive Media Queries for Mobile Devices */
+        @media (max-width: 768px) {
+            body { padding: 6px; }
+            .container { padding: 10px; }
+            h1 { font-size: 18px; }
+            
+            /* Hide Desktop Table and Show Mobile Cards */
+            .table-responsive { display: none !important; }
+            .mobile-cards-container { display: flex !important; }
+
+            /* KPI Grid Layout adjustment for mobile */
+            .kpi-container { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .kpi-card:last-child { grid-column: span 2; }
+            .kpi-num { font-size: 16px; }
+
+            /* Sticky Wrapper Adjustments */
+            .sticky-wrapper { position: relative; top: 0; padding: 10px; }
+            .sticky-row { flex-direction: column; align-items: stretch; gap: 10px; }
+            .sticky-row .flex-group { width: 100%; justify-content: space-between; }
+            
+            /* Mobile utility adjustments for buttons placement */
+            .sticky-action-buttons { width: 100%; justify-content: flex-end; margin-top: 5px; }
+
+            /* Horizontal Scrollable Filter Row for Mobile Screen */
+            .sticky-row:last-child .flex-group { 
+                overflow-x: auto; 
+                white-space: nowrap; 
+                flex-wrap: nowrap; 
+                padding-bottom: 5px;
+                width: 100%; 
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+            }
+            .sticky-row:last-child .flex-group::-webkit-scrollbar { height: 4px; }
+            .sticky-row:last-child .flex-group::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+            .btn-sm { padding: 6px 12px; flex-shrink: 0; }
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; }
+            .no-print { display: none !important; }
+            .sticky-wrapper { position: relative; top: 0; box-shadow: none; border: 1px solid var(--border); background: var(--light); padding: 15px;}
+            .sticky-divider { display: none; }
+            .sticky-row:last-child { display: none !important; }
+            .table-responsive { display: block !important; } /* Always print table format */
+            .mobile-cards-container { display: none !important; }
+            input, select, textarea { display: none !important; } 
+            
+            .print-status-text { display: inline-block !important; } 
+            .print-remarks-text { display: block !important; } 
+            .print-filter-info-block { display: block !important; } 
+            .print-received-date { display: block !important; } 
+            
+            .log-container { border: none; overflow: visible; max-height: none; }
+            .edit-time-box { display: none !important; }
+            .received-date-lbl { display: none !important; } 
+            input[type="text"] { display: inline-block !important; border: none; padding: 0; font-weight: bold;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🕌 জামাত ফোন কল ও রিপোর্ট ট্র্যাকিং সিস্টেম</h1>
+    <div class="version-tag">Version 4.2.1 (Mobile Responsive)</div>
+
+    <div class="accordion-header no-print" onclick="toggleAccordion()">
+        <span>⚙️ ১. সিস্টেম কন্ট্রোল ও ডাটা ব্যাকআপ / ইমপোর্ট (এখানে ক্লিক করুন)</span>
+        <button class="btn btn-outline btn-sm" id="accordionBtn" style="background:white; border-color:#bdf1bd; color:#1e4620;">দেখুন 🔽</button>
+    </div>
+
+    <div class="accordion-content no-print" id="accordionContent">
+        <div class="section-title" style="margin-bottom:15px;">
+            <span>ডাটা ব্যাকআপ / ইমপোর্ট কন্ট্রোল প্যানেল</span>
+            <div class="flex-group">
+                <button class="btn btn-info" onclick="exportBackup()">Export Backup 📥</button>
+                <button class="btn btn-outline" onclick="document.getElementById('backupFile').click()">Import Backup 📤</button>
+                <input type="file" id="backupFile" accept=".json" style="display:none;" onchange="importBackup(this)">
+            </div>
+        </div>
+        <div class="flex-group" style="margin-bottom: 15px;">
+            <div class="form-control" style="width: 100%; max-width: 300px;">
+                <label>মাস্টার CSV ফাইল আপলোড করুন:</label>
+                <input type="file" id="csvFile" accept=".csv">
+            </div>
+            <div class="form-control" style="align-self: flex-end;">
+                <button class="btn btn-primary" onclick="processCSV()">ফাইল লোড করুন</button>
+            </div>
+        </div>
+
+        <div id="mappingSection" style="display:none; border-top: 1px solid var(--border); padding-top: 15px;">
+            <p style="font-size: 13px; font-weight: bold; margin-bottom: 10px; color: var(--secondary);">আপনার ফাইলের কলামের সাথে সফটওয়্যারের পদবী মিলান (Map Columns):</p>
+            <div class="mapping-grid">
+                <div class="form-control">
+                    <label>জামাত/ব্রাঞ্চ আইডি কলাম:</label>
+                    <select id="mapId" class="map-dropdown"></select>
+                </div>
+                <div class="form-control">
+                    <label>জামাত/ব্রাঞ্চ নাম কলাম:</label>
+                    <select id="mapJamat" class="map-dropdown"></select>
+                </div>
+                <div class="form-control">
+                    <label>১ম পদ (নাম ও ফোন কলাম):</label>
+                    <select id="mapP1Name" class="map-dropdown" style="margin-bottom:3px;"></select>
+                    <select id="mapP1Phone" class="map-dropdown"></select>
+                </div>
+                <div class="form-control">
+                    <label>২য় পদ (নাম ও ফোন কলাম):</label>
+                    <select id="mapP2Name" class="map-dropdown" style="margin-bottom:3px;"></select>
+                    <select id="mapP2Phone" class="map-dropdown"></select>
+                </div>
+                <div class="form-control">
+                    <label>৩য় পদ (নাম ও ফোন কলাম):</label>
+                    <select id="mapP3Name" class="map-dropdown" style="margin-bottom:3px;"></select>
+                    <select id="mapP3Phone" class="map-dropdown"></select>
+                </div>
+            </div>
+            
+            <label class="checkbox-container">
+                <input type="checkbox" id="isRecurringCheck" checked>
+                এটি আমার স্থায়ী/রিকারিং (Recurring) জামাতリスト
+            </label>
+            
+            <button class="btn btn-success" style="margin-top:15px; width: 100%;" onclick="generateMyList()">আমার নিগরানাধীন তালিকা ইনজেক্ট করুন</button>
+        </div>
+    </div>
+
+    <div class="sticky-wrapper">
+        <div class="sticky-row">
+            <div class="form-control" style="flex: 1; min-width: 140px;">
+                <label>নিগরানের নাম:</label>
+                <input type="text" id="nigranName" value="" placeholder="আপনার নাম" oninput="saveSessionData()">
+            </div>
+            <div class="form-control" style="flex: 2.2; min-width: 280px;">
+                <label>চলতি একটিভ ইভেন্ট:</label>
+                <div style="display: flex; align-items: center; gap: 6px; width: 100%;">
+                    <button class="nav-arrow-btn no-print" onclick="navigateEvent('prev')" title="পূর্ববর্তী">◀</button>
+                    <select id="activeEventSelect" style="font-weight: bold; color: var(--primary); flex: 1;" onchange="switchEvent(this.value)"></select>
+                    <button class="nav-arrow-btn no-print" onclick="navigateEvent('next')" title="পরবর্তী">▶</button>
+                </div>
+                <span class="print-status-text" id="printActiveEventName" style="color: var(--primary);"></span>
+            </div>
+            <div class="form-control" style="flex: 1; min-width: 120px;">
+                <label>শেষ তারিখ (Deadline):</label>
+                <input type="date" id="eventDeadline" onchange="updateEventDeadline(this.value)">
+                <span class="print-status-text" id="printEventDeadline"></span>
+            </div>
+            <div class="no-print flex-group sticky-action-buttons" style="align-self: flex-end;">
+                <button class="btn btn-primary btn-sm" onclick="addNewEventPrompt()">+ নতুন</button>
+                <button class="btn btn-success btn-sm" onclick="window.print()">🖨️ PDF</button>
+                <button class="btn btn-info btn-sm" onclick="exportToCSV()">📊 CSV</button>
+            </div>
+        </div>
+
+        <div class="sticky-divider no-print"></div>
+
+        <div class="sticky-row no-print">
+            <div class="sticky-filter-card">
+                <span id="kpiFilterTitle">সব জামাত</span>
+                <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 13px;" id="kpiFilterCount">0</span>
+            </div>
+            <div class="flex-group">
+                <button class="btn btn-outline btn-sm active" id="btnFilterAll" onclick="setFilter('all')">সব জামাত</button>
+                <button class="btn btn-outline btn-sm" id="btnFilterApplicable" onclick="setFilter('applicable_only')">প্রযোজ্য</button>
+                <button class="btn btn-outline btn-sm btn-today" id="btnFilterTodayCall" onclick="setFilter('today_call')">আজকের সফল যোগাযোগ 📞</button>
+                <button class="btn btn-outline btn-sm" id="btnFilterCall" onclick="setFilter('call_pending')">যোগাযোগ বাকি 📞</button>
+                <button class="btn btn-outline btn-sm" id="btnFilterReport" onclick="setFilter('report_pending')">রিপোর্ট বাকি ⏳</button>
+                <button class="btn btn-outline btn-sm" id="btnFilterReceived" onclick="setFilter('report_received')">রিপোর্ট প্রাপ্ত ✅</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="kpi-container">
+        <div class="kpi-card">
+            <div class="kpi-title" id="kpiTotalTitle">মোট / প্রযোজ্য জামাত</div>
+            <div class="kpi-num" id="kpiTotal">0</div>
+        </div>
+        <div class="kpi-card success">
+            <div class="kpi-title">যোগাযোগ সফল</div>
+            <div class="kpi-num" id="kpiReached">0</div>
+        </div>
+        <div class="kpi-card warning">
+            <div class="kpi-title">যোগাযোগ বাকি</div>
+            <div class="kpi-num" id="kpiCallPending">0</div>
+        </div>
+        <div class="kpi-card success">
+            <div class="kpi-title">রিপোর্ট প্রাপ্তি</div>
+            <div class="kpi-num" id="kpiReportReceived">0</div>
+        </div>
+        <div class="kpi-card danger">
+            <div class="kpi-title">রিপোর্ট বাকি</div>
+            <div class="kpi-num" id="kpiReportPending">0</div>
+        </div>
+    </div>
+
+    <div class="print-filter-info-block" id="pdfFilterBlock">
+        🖨️ প্রিন্ট ফিল্টার স্ট্যাটাস: <span id="pdfFilterName" style="color:#000;">সব জামাত</span> (<span id="pdfFilterCount" style="color:var(--success);">0</span> টি জামাত)
+    </div>
+
+    <div class="section table-responsive" style="background: white; padding-top: 5px;">
+        <table id="trackingTable">
+            <thead>
+                <tr>
+                    <th width="6%">ID</th>
+                    <th width="14%">জামাতের নাম</th>
+                    <th width="26%">দায়িত্বশীলদের তথ্য (নাম ও ফোন)</th>
+                    <th width="16%">সর্বশেষ ৩টি কল লগ</th>
+                    <th width="12%">ফোনের স্ট্যাটাস</th>
+                    <th width="11%">রিপোর্ট স্ট্যাটাস</th>
+                    <th width="15%">রিমার্কস ও লোকাল আলোচনা</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td colspan="7" style="text-align:center; color:#888; padding:20px;">কোনো ডাটা নেই। উপর থেকে ফাইল ইমপোর্ট করুন।</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mobile-cards-container" id="mobileCardsContent">
+        </div>
+
+    <div class="section no-print" style="background: #fff5f5; border-color: #feb2b2; margin-top: 25px;">
+        <div class="section-title" style="color: var(--danger); font-size:13px;">⚠️ ডেঞ্জার ও রিসেট জোন</div>
+        <div class="flex-group" style="width: 100%;">
+            <button class="btn btn-warning btn-sm" style="flex:1;" onclick="archiveCurrentEvent()">Archive Event 📁</button>
+            <button class="btn btn-danger btn-sm" style="flex:1;" onclick="resetCurrentEventFields()">Reset Fields 🔄</button>
+            <button class="btn btn-outline btn-danger btn-sm" style="flex:1;" onclick="deleteCurrentEventEntirely()">Delete Permanent ❌</button>
+        </div>
+    </div>
+
+    <div class="section no-print" style="background: #edf2f7; margin-top: 15px;">
+        <div class="section-title" style="font-size:13px;">📁 আর্কাইভড ইভেন্ট হিস্টোরি (পুরাতন রেকর্ড)</div>
+        <div id="archiveContainer" style="font-size:12px; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+            <p style="color:#718096; font-style: italic;">কোনো ইভেন্ট আর্কাইভ করা নেই।</p>
+        </div>
+    </div>
+</div>
+
+<div id="timePickerModal" class="modal-overlay no-print">
+    <div class="modal-content">
+        <h3>📅 কল করার কাস্টম সময় (১২ ঘণ্টা)</h3>
+        <label>তারিখ নির্বাচন করুন:</label>
+        <input type="date" id="modalDateInput" style="margin-bottom:10px;">
+        
+        <label>সময় নির্বাচন করুন (AM/PM):</label>
+        <div class="time-picker-12h">
+            <select id="modalHourSelect">
+                <option value="01">01</option><option value="02">02</option><option value="03">03</option>
+                <option value="04">04</option><option value="05">05</option><option value="06">06</option>
+                <option value="07">07</option><option value="08">08</option><option value="09">09</option>
+                <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+            </select>
+            <select id="modalMinuteSelect"></select>
+            <select id="modalAmPmSelect">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select>
+        </div>
+        <div class="flex-group" style="justify-content: center; gap:10px; border-top:1px solid #e2e8f0; padding-top:12px;">
+            <button class="btn btn-success btn-sm" onclick="saveManualTime12H()">সংরক্ষণ করুন</button>
+            <button class="btn btn-outline btn-sm" onclick="closeTimeModal()">বাতিল</button>
+        </div>
+    </div>
+</div>
+
+<div id="reportDatePickerModal" class="modal-overlay no-print">
+    <div class="modal-content">
+        <h3>📅 রিপোর্ট রিসিভের কাস্টম তারিখ</h3>
+        <label>তারিখ নির্বাচন করুন:</label>
+        <input type="date" id="modalReportDateInput" style="margin-bottom:15px;">
+        <div class="flex-group" style="justify-content: center; gap:10px; border-top:1px solid #e2e8f0; padding-top:12px;">
+            <button class="btn btn-success btn-sm" onclick="saveManualReportDate()">সংরক্ষণ করুন</button>
+            <button class="btn btn-outline btn-sm" onclick="closeReportDateModal()">বাতিল</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let myAssignedBranches = []; 
+    let eventsData = {}; 
+    let activeEventId = "";
+    let archives = [];
+    let currentFilter = 'all';
+    let currentEditingRowIndex = null; 
+    let parsedHeaders = [];
+    let parsedRows = [];
+
+    function toggleAccordion() {
+        let content = document.getElementById('accordionContent');
+        let btn = document.getElementById('accordionBtn');
+        if (content.style.display === "block") {
+            content.style.display = "none";
+            btn.innerText = "দেখুন 🔽";
+        } else {
+            content.style.display = "block";
+            btn.innerText = "লুকান 🔼";
+        }
+    }
+
+    function convertToBengaliDigits(num) {
+        if(num === null || num === undefined) return '';
+        const eng = ['0','1','2','3','4','5','6','7','8','9'];
+        const ben = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+        let str = num.toString();
+        for(let i=0; i<10; i++) {
+            str = str.replaceAll(eng[i], ben[i]);
+        }
+        return str;
+    }
+
+    window.onload = function() {
+        let minSelect = document.getElementById('modalMinuteSelect');
+        if(minSelect) {
+            minSelect.innerHTML = '';
+            for(let m=0; m<60; m++) {
+                let displayM = m < 10 ? '0'+m : m;
+                minSelect.innerHTML += `<option value="${displayM}">${displayM}</option>`;
+            }
+        }
+
+        if(localStorage.getItem('nigranName')) document.getElementById('nigranName').value = localStorage.getItem('nigranName');
+        if(localStorage.getItem('myAssignedBranches')) myAssignedBranches = JSON.parse(localStorage.getItem('myAssignedBranches'));
+        if(localStorage.getItem('trackingArchives')) archives = JSON.parse(localStorage.getItem('trackingArchives'));
+        
+        if(localStorage.getItem('simultaneousEvents')) {
+            eventsData = JSON.parse(localStorage.getItem('simultaneousEvents'));
+            activeEventId = localStorage.getItem('activeEventId') || Object.keys(eventsData)[0];
+        }
+
+        if(Object.keys(eventsData).length === 0) {
+            let defaultId = "Evt_" + Date.now();
+            eventsData[defaultId] = {
+                name: "কোয়ার্টারলি অডিট ও ফাইনান্সিয়াল রিপোর্ট কালেকশন",
+                deadline: "",
+                tracking: myAssignedBranches.map(b => createBlankTrackingRow(b.id, b.jamat, b.contacts))
+            };
+            activeEventId = defaultId;
+        }
+
+        populateEventDropdown();
+        syncActiveEventFields();
+        renderTable();
+        renderArchives();
+    }
+
+    function createBlankTrackingRow(id, jamat, contacts) {
+        return { id: id, jamat: jamat, contacts: contacts, logs: [], callStatus: 'Pending', reportStatus: 'Pending', receivedDate: '', remarks: '' };
+    }
+
+    function saveEventsToStorage() {
+        localStorage.setItem('simultaneousEvents', JSON.stringify(eventsData));
+        localStorage.setItem('activeEventId', activeEventId);
+    }
+
+    function saveSessionData() {
+        localStorage.setItem('nigranName', document.getElementById('nigranName').value);
+    }
+
+    function populateEventDropdown() {
+        let select = document.getElementById('activeEventSelect');
+        select.innerHTML = '';
+        Object.keys(eventsData).forEach(id => {
+            let opt = document.createElement('option');
+            opt.value = id;
+            opt.innerText = eventsData[id].name;
+            if(id === activeEventId) opt.selected = true;
+            select.appendChild(opt);
+        });
+        if(eventsData[activeEventId]) {
+            document.getElementById('printActiveEventName').innerText = eventsData[activeEventId].name;
+        }
+    }
+
+    function getFormatedBengaliDate(dateInput) {
+        if (!dateInput) return 'নির্দিষ্ট নয়';
+        let d = new Date(dateInput);
+        if (isNaN(d.getTime())) return 'নির্দিষ্ট নয়';
+        return d.toLocaleDateString('bn-BD');
+    }
+
+    function syncActiveEventFields() {
+        if(!eventsData[activeEventId]) return;
+        let dline = eventsData[activeEventId].deadline || "";
+        document.getElementById('eventDeadline').value = dline;
+        document.getElementById('printEventDeadline').innerText = getFormatedBengaliDate(dline);
+        document.getElementById('printActiveEventName').innerText = eventsData[activeEventId].name;
+    }
+
+    function switchEvent(eventId) {
+        activeEventId = eventId;
+        localStorage.setItem('activeEventId', activeEventId);
+        syncActiveEventFields();
+        renderTable();
+    }
+
+    function navigateEvent(direction) {
+        let keys = Object.keys(eventsData);
+        if(keys.length <= 1) return; 
+        let currentIndex = keys.indexOf(activeEventId);
+        let nextIndex = currentIndex;
+        
+        if(direction === 'next') nextIndex = (currentIndex + 1) % keys.length;
+        else if(direction === 'prev') nextIndex = (currentIndex - 1 + keys.length) % keys.length;
+        
+        let targetEventId = keys[nextIndex];
+        document.getElementById('activeEventSelect').value = targetEventId;
+        switchEvent(targetEventId);
+    }
+
+    function addNewEventPrompt() {
+        let name = prompt("নতুন ইভেন্ট/রিপোর্টের নাম লিখুন:");
+        if(!name || name.trim() === "") return;
+        let newId = "Evt_" + Date.now();
+        eventsData[newId] = {
+            name: name.trim(),
+            deadline: "",
+            tracking: myAssignedBranches.map(b => createBlankTrackingRow(b.id, b.jamat, b.contacts))
+        };
+        saveEventsToStorage();
+        populateEventDropdown();
+        switchEvent(newId);
+    }
+
+    function updateEventDeadline(val) {
+        if(eventsData[activeEventId]) {
+            eventsData[activeEventId].deadline = val;
+            document.getElementById('printEventDeadline').innerText = getFormatedBengaliDate(val);
+            saveEventsToStorage();
+        }
+    }
+
+    function processCSV() {
+        const fileInput = document.getElementById('csvFile');
+        if (!fileInput.files[0]) { alert('অনুগ্রহ করে একটি CSV ফাইল সিলেক্ট করুন।'); return; }
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const text = e.target.result;
+            const lines = text.split('\n');
+            if(lines.length === 0) return;
+
+            parsedHeaders = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            parsedRows = [];
+            for(let i=1; i<lines.length; i++) {
+                if(lines[i].trim() === '') continue;
+                let cols = lines[i].split(',').map(c => c.trim().replace(/"/g, ''));
+                parsedRows.push(cols);
+            }
+
+            const dropdowns = document.querySelectorAll('.map-dropdown');
+            dropdowns.forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">--কলাম সিলেক্ট করুন--</option>';
+                parsedHeaders.forEach((header, index) => {
+                    dropdown.innerHTML += `<option value="${index}">${header}</option>`;
+                });
+            });
+            document.getElementById('mappingSection').style.display = 'block';
+        };
+        reader.readAsText(fileInput.files[0], 'UTF-8');
+    }
+
+    function generateMyList() {
+        const idIdx = document.getElementById('mapId').value;
+        const jamatIdx = document.getElementById('mapJamat').value;
+        const p1N = document.getElementById('mapP1Name').value, p1P = document.getElementById('mapP1Phone').value;
+        const p2N = document.getElementById('mapP2Name').value, p2P = document.getElementById('mapP2Phone').value;
+        const p3N = document.getElementById('mapP3Name').value, p3P = document.getElementById('mapP3Phone').value;
+        const isRecurring = document.getElementById('isRecurringCheck').checked;
+
+        if(!idIdx || !jamatIdx) { alert('আইডি এবং জামাতের নাম কলাম সিলেক্ট করা বাধ্যতামুলক!'); return; }
+        if(!confirm(`টোটাল ${parsedRows.length} টি জামাত ইনজেক্ট করতে চান?`)) return;
+
+        let temporaryList = parsedRows.map(row => {
+            let contactsArr = [];
+            if(p1P && row[p1P]) contactsArr.push(`• ${row[p1N] || 'সভাপতি'}: ${row[p1P]}`);
+            if(p2P && row[p2P]) contactsArr.push(`• ${row[p2N] || 'অর্থ সম্পাদক'}: ${row[p2P]}`);
+            if(p3P && row[p3P]) contactsArr.push(`• ${row[p3N] || 'মুরুব্বী'}: ${row[p3P]}`);
+            return { id: row[idIdx] || '', jamat: row[jamatIdx] || '', contacts: contactsArr.join('\n') };
+        });
+
+        if (isRecurring) {
+            myAssignedBranches = temporaryList;
+            localStorage.setItem('myAssignedBranches', JSON.stringify(myAssignedBranches));
+        }
+        
+        if(eventsData[activeEventId]) {
+            eventsData[activeEventId].tracking = temporaryList.map(b => createBlankTrackingRow(b.id, b.jamat, b.contacts));
+            saveEventsToStorage();
+        }
+        document.getElementById('mappingSection').style.display = 'none';
+        document.getElementById('csvFile').value = '';
+        renderTable();
+        alert('তালিকা সফলভাবে ইনজেক্ট করা হয়েছে!');
+    }
+
+    function setFilter(filterType) {
+        currentFilter = filterType;
+        document.querySelectorAll('.no-print .btn-outline').forEach(btn => btn.classList.remove('active'));
+        
+        if(filterType === 'all') document.getElementById('btnFilterAll').classList.add('active');
+        if(filterType === 'applicable_only') document.getElementById('btnFilterApplicable').classList.add('active');
+        if(filterType === 'today_call') document.getElementById('btnFilterTodayCall').classList.add('active');
+        if(filterType === 'call_pending') document.getElementById('btnFilterCall').classList.add('active');
+        if(filterType === 'report_pending') document.getElementById('btnFilterReport').classList.add('active');
+        if(filterType === 'report_received') document.getElementById('btnFilterReceived').classList.add('active');
+        
+        let filterTitleText = "সব জামাত";
+        if(filterType === 'applicable_only') filterTitleText = "প্রযোজ্য জামাত";
+        if(filterType === 'today_call') filterTitleText = "আজকের সফল যোগাযোগ 📞";
+        if(filterType === 'call_pending') filterTitleText = "যোগাযোগ বাকি";
+        if(filterType === 'report_pending') filterTitleText = "রিপোর্ট বাকি";
+        if(filterType === 'report_received') filterTitleText = "রিপোর্ট প্রাপ্ত";
+        
+        document.getElementById('kpiFilterTitle').innerText = filterTitleText;
+        document.getElementById('pdfFilterName').innerText = filterTitleText;
+        renderTable();
+    }
+
+    function autoExpandTextarea(el) {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+    }
+
+    function syncRemarksOnInput(index, value) {
+        eventsData[activeEventId].tracking[index].remarks = value;
+        saveEventsToStorage();
+        
+        let dTable = document.getElementById('trackingTable');
+        if(dTable) {
+            let textareas = dTable.querySelectorAll('textarea');
+            if(textareas[index] && textareas[index].value !== value) textareas[index].value = value;
+            let divs = dTable.querySelectorAll('.print-remarks-text');
+            if(divs[index]) divs[index].innerText = value || '-';
+        }
+        let mContent = document.getElementById('mobileCardsContent');
+        if(mContent) {
+            let mTextareas = mContent.querySelectorAll('textarea');
+            if(mTextareas[index] && mTextareas[index].value !== value) mTextareas[index].value = value;
+        }
+    }
+
+    function updateCallStatus(index, status) {
+        let row = eventsData[activeEventId].tracking[index];
+        if(status === 'Pending') {
+            row.callStatus = status;
+            saveEventsToStorage();
+            renderTable();
+            return;
+        }
+        row.callStatus = status;
+        let now = new Date();
+        let dateKey = now.toLocaleDateString('bn-BD');
+        let timeStr = dateKey + ' ' + now.toLocaleTimeString('bn-BD', {hour: '2-digit', minute:'2-digit'});
+        
+        let statusBangla = { 'Reached': 'সফল', 'ReachedAgain': 'সফল (পুনরায়)', 'Unreachable': 'অপ্রাপ্য', 'Busy': 'ব্যস্ত' }[status];
+        row.logs.unshift(`${timeStr} -> ${statusBangla}`);
+        if(row.logs.length > 3) row.logs.pop();
+        
+        saveEventsToStorage();
+        renderTable();
+    }
+
+    function updateReportStatus(index, status) {
+        let row = eventsData[activeEventId].tracking[index];
+        row.reportStatus = status;
+        if(status === 'Received') {
+            let now = new Date();
+            row.receivedDate = now.toISOString().split('T')[0];
+        } else {
+            row.receivedDate = '';
+        }
+        saveEventsToStorage();
+        renderTable();
+    }
+
+    function openTimeModal(index) {
+        currentEditingRowIndex = index;
+        let today = new Date().toISOString().split('T')[0];
+        document.getElementById('modalDateInput').value = today;
+        document.getElementById('timePickerModal').style.display = 'flex';
+    }
+
+    function closeTimeModal() {
+        document.getElementById('timePickerModal').style.display = 'none';
+    }
+
+    function saveManualTime12H() {
+        let dateVal = document.getElementById('modalDateInput').value;
+        let hr = document.getElementById('modalHourSelect').value;
+        let min = document.getElementById('modalMinuteSelect').value;
+        let ampm = document.getElementById('modalAmPmSelect').value;
+        
+        if(!dateVal) { alert('তারিখ সিলেক্ট করুন'); return; }
+        let ampmBangla = (ampm === 'AM') ? 'এএম' : 'পিএম';
+        let customTimeStr = getFormatedBengaliDate(dateVal) + ` ${convertToBengaliDigits(hr)}:${convertToBengaliDigits(min)} ${ampmBangla}`;
+        let row = eventsData[activeEventId].tracking[currentEditingRowIndex];
+        
+        row.logs.unshift(`${customTimeStr} -> কাস্টম`);
+        if(row.logs.length > 3) row.logs.pop();
+        
+        saveEventsToStorage();
+        closeTimeModal();
+        renderTable();
+    }
+
+    function openReportDateModal(index) {
+        currentEditingRowIndex = index;
+        let row = eventsData[activeEventId].tracking[index];
+        let dVal = row.receivedDate;
+        if (!dVal || isNaN(new Date(dVal).getTime())) {
+            dVal = new Date().toISOString().split('T')[0];
+        }
+        document.getElementById('modalReportDateInput').value = dVal;
+        document.getElementById('reportDatePickerModal').style.display = 'flex';
+    }
+
+    function closeReportDateModal() {
+        document.getElementById('reportDatePickerModal').style.display = 'none';
+    }
+
+    function saveManualReportDate() {
+        let dateVal = document.getElementById('modalReportDateInput').value;
+        if(!dateVal) { alert('তারিখ নির্বাচন করুন'); return; }
+        
+        let row = eventsData[activeEventId].tracking[currentEditingRowIndex];
+        row.receivedDate = dateVal;
+        
+        saveEventsToStorage();
+        closeReportDateModal();
+        renderTable();
+    }
+
+    function updateKPIs(filteredCount) {
+        if(!eventsData[activeEventId] || !eventsData[activeEventId].tracking) return;
+        let list = eventsData[activeEventId].tracking;
+        
+        let total = list.length;
+        let applicable = list.filter(b => b.reportStatus !== 'NotApplicable').length;
+        
+        let reached = list.filter(b => (b.callStatus === 'Reached' || b.callStatus === 'ReachedAgain') && b.reportStatus !== 'NotApplicable').length;
+        let callPending = list.filter(b => b.callStatus !== 'Reached' && b.callStatus !== 'ReachedAgain' && b.reportStatus !== 'Received' && b.reportStatus !== 'NotApplicable').length;
+        let repReceived = list.filter(b => b.reportStatus === 'Received').length;
+        let repPending = list.filter(b => b.reportStatus === 'Pending').length;
+
+        document.getElementById('kpiTotal').innerText = `${total} / ${applicable}`;
+        document.getElementById('kpiReached').innerText = reached;
+        document.getElementById('kpiCallPending').innerText = callPending;
+        document.getElementById('kpiReportReceived').innerText = repReceived;
+        document.getElementById('kpiReportPending').innerText = repPending;
+        
+        document.getElementById('kpiFilterCount').innerText = filteredCount;
+        document.getElementById('pdfFilterCount').innerText = filteredCount;
+
+        let todayStringBengali = new Date().toLocaleDateString('bn-BD');
+        let todayCallCount = list.filter(b => {
+            if (b.logs.length === 0) return false;
+            let latestLog = b.logs[0];
+            return latestLog.includes(todayStringBengali) && (latestLog.includes('সফল')) && (b.callStatus === 'Reached' || b.callStatus === 'ReachedAgain');
+        }).length;
+
+        let btnToday = document.getElementById('btnFilterTodayCall');
+        if(btnToday) btnToday.innerText = `আজকের সফল যোগাযোগ 📞 (${todayCallCount})`;
+
+        let btnCall = document.getElementById('btnFilterCall');
+        let btnReport = document.getElementById('btnFilterReport');
+        
+        if (btnCall) {
+            btnCall.innerText = `যোগাযোগ বাকি 📞 (${callPending})`;
+            btnCall.disabled = (callPending === 0);
+            if (callPending === 0 && currentFilter === 'call_pending') setFilter('all');
+        }
+        if (btnReport) {
+            btnReport.innerText = `রিপোর্ট বাকি ⏳ (${repPending})`;
+            btnReport.disabled = (repPending === 0);
+            if (repPending === 0 && currentFilter === 'report_pending') setFilter('all');
+        }
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        const mCardsContainer = document.getElementById('mobileCardsContent');
+        tbody.innerHTML = '';
+        mCardsContainer.innerHTML = '';
+
+        if(!eventsData[activeEventId] || !eventsData[activeEventId].tracking || eventsData[activeEventId].tracking.length === 0) {
+            let emptyMsg = `<tr><td colspan="7" style="text-align:center; color:#888; padding:20px;">এই ইভেন্টে কোনো ডাটা লোড করা নেই। উপর থেকে এক্সেল ফাইল আপলোড করে তালিকা ইনজেক্ট করুন।</td></tr>`;
+            tbody.innerHTML = emptyMsg;
+            mCardsContainer.innerHTML = `<div style="text-align:center; color:#888; padding:20px; font-size:13px;">কোনো ডাটা পাওয়া যায়নি।</div>`;
+            updateKPIs(0);
+            return;
+        }
+
+        let activeTrackingList = eventsData[activeEventId].tracking;
+        let todayStringBengali = new Date().toLocaleDateString('bn-BD');
+
+        let filteredData = activeTrackingList.filter(branch => {
+            if (currentFilter === 'all') return true;
+            if (currentFilter === 'applicable_only') return branch.reportStatus !== 'NotApplicable';
+            if (currentFilter === 'today_call') {
+                if (branch.logs.length === 0) return false;
+                let latestLog = branch.logs[0];
+                return latestLog.includes(todayStringBengali) && (latestLog.includes('সফল')) && (branch.callStatus === 'Reached' || branch.callStatus === 'ReachedAgain');
+            }
+            if (currentFilter === 'call_pending') return branch.callStatus !== 'Reached' && branch.callStatus !== 'ReachedAgain' && branch.reportStatus !== 'Received' && branch.reportStatus !== 'NotApplicable';
+            if (currentFilter === 'report_pending') return branch.reportStatus === 'Pending';
+            if (currentFilter === 'report_received') return branch.reportStatus === 'Received';
+            return true;
+        });
+
+        filteredData.forEach((row) => {
+            let actualIndex = activeTrackingList.findIndex(b => b.id === row.id);
+            let logsHtml = row.logs.map(l => `<div class="log-item">${l}</div>`).join('');
+            let displayDate = row.receivedDate ? getFormatedBengaliDate(row.receivedDate) : '';
+            
+            let callBg = { 'Pending': '#fff3cd', 'Reached': '#d4edda', 'ReachedAgain': '#c3e6cb', 'Unreachable': '#f8d7da', 'Busy': '#e2e3e5' }[row.callStatus];
+            let reportBg = { 'Pending': '#fff3cd', 'Received': '#d4edda', 'NotApplicable': '#e2e3e5' }[row.reportStatus];
+
+            // 1. Build Desktop Table Row
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="text-align:center; font-weight:bold;">${row.id}</td>
+                <td style="font-weight:bold; color:var(--primary);">${row.jamat}</td>
+                <td><div class="contact-info-block">${row.contacts || '-'}</div></td>
+                <td>
+                    <div class="log-container">${logsHtml || '<span style="color:#aaa;">কোনো লগ নেই</span>'}</div>
+                    <div class="edit-time-box no-print" onclick="openTimeModal(${actualIndex})">🕒 ব্যাকডেট লগ যোগ করুন</div>
+                </td>
+                <td style="background:${callBg};">
+                    <select class="status-select" onchange="updateCallStatus(${actualIndex}, this.value)" ${row.reportStatus === 'NotApplicable' ? 'disabled' : ''}>
+                        <option value="Pending" ${row.callStatus === 'Pending' ? 'selected' : ''}>⏳ বাকি</option>
+                        <option value="Reached" ${row.callStatus === 'Reached' ? 'selected' : ''}>✅ সফল</option>
+                        <option value="ReachedAgain" ${row.callStatus === 'ReachedAgain' ? 'selected' : ''}>🔄 সফল (পুনরায়)</option>
+                        <option value="Unreachable" ${row.callStatus === 'Unreachable' ? 'selected' : ''}>❌ অপ্রাপ্য</option>
+                        <option value="Busy" ${row.callStatus === 'Busy' ? 'selected' : ''}>🔇 ব্যস্ত</option>
+                    </select>
+                    <span class="print-status-text">${{ 'Pending': 'বাকি', 'Reached': 'সচল/সফল', 'ReachedAgain': 'সফল (পুনরায়)', 'Unreachable': 'অপ্রাপ্য', 'Busy': 'ব্যস্ত' }[row.callStatus]}</span>
+                </td>
+                <td style="background:${reportBg};">
+                    <select class="status-select" onchange="updateReportStatus(${actualIndex}, this.value)">
+                        <option value="Pending" ${row.reportStatus === 'Pending' ? 'selected' : ''}>⏳ বাকি</option>
+                        <option value="Received" ${row.reportStatus === 'Received' ? 'selected' : ''}>✅ প্রাপ্ত</option>
+                        <option value="NotApplicable" ${row.reportStatus === 'NotApplicable' ? 'selected' : ''}>🚫 প্রযোজ্য নয়</option>
+                    </select>
+                    <span class="print-status-text">${{ 'Pending': 'বাকি', 'Received': 'প্রাপ্ত', 'NotApplicable': 'প্রযোজ্য নয়' }[row.reportStatus]}</span>
+                    ${row.reportStatus === 'Received' ? `
+                        <div class="received-date-lbl">
+                            <span>📅 ${displayDate === 'নির্দিষ্ট নয়' ? 'আজ' : displayDate}</span>
+                            <button class="btn btn-outline btn-sm no-print" style="padding:2px 6px; font-size:11px; margin-top:2px; background:#fff;" onclick="openReportDateModal(${actualIndex})">বদল</button>
+                        </div>
+                        <div class="print-received-date">📅 ${displayDate === 'নির্দিষ্ট নয়' ? 'আজ' : displayDate}</div>
+                    ` : ''}
+                </td>
+                <td>
+                    <textarea class="no-print" oninput="autoExpandTextarea(this); syncRemarksOnInput(${actualIndex}, this.value)">${row.remarks || ''}</textarea>
+                    <div class="print-remarks-text">${row.remarks || '-'}</div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+
+            // 2. Build Mobile Responsive Card (Pure Bengali [বদল] Fixed Here)
+            let card = document.createElement('div');
+            card.className = "mobile-card";
+            card.innerHTML = `
+                <div class="mobile-card-header">
+                    <span class="mobile-card-title">${row.jamat}</span>
+                    <span class="mobile-card-id">ID: ${row.id}</span>
+                </div>
+                <div class="mobile-field-group">
+                    <span class="mobile-field-label">দায়িত্বশীলদের তথ্য:</span>
+                    <div class="contact-info-block" style="background:#f8fafc; padding:8px; border-radius:6px; font-size:12.5px;">${row.contacts || '-'}</div>
+                </div>
+                <div class="mobile-status-grid">
+                    <div style="background:${callBg}; padding:6px; border-radius:6px;">
+                        <span class="mobile-field-label" style="color:#111;">কল স্ট্যাটাস:</span>
+                        <select class="status-select" onchange="updateCallStatus(${actualIndex}, this.value)" ${row.reportStatus === 'NotApplicable' ? 'disabled' : ''}>
+                            <option value="Pending" ${row.callStatus === 'Pending' ? 'selected' : ''}>⏳ বাকি</option>
+                            <option value="Reached" ${row.callStatus === 'Reached' ? 'selected' : ''}>✅ সফল</option>
+                            <option value="ReachedAgain" ${row.callStatus === 'ReachedAgain' ? 'selected' : ''}>🔄 সফল (পুনরায়)</option>
+                            <option value="Unreachable" ${row.callStatus === 'Unreachable' ? 'selected' : ''}>❌ অপ্রাপ্য</option>
+                            <option value="Busy" ${row.callStatus === 'Busy' ? 'selected' : ''}>🔇 ব্যস্ত</option>
+                        </select>
+                    </div>
+                    <div style="background:${reportBg}; padding:6px; border-radius:6px;">
+                        <span class="mobile-field-label" style="color:#111;">রিপোর্ট স্ট্যাটাস:</span>
+                        <select class="status-select" onchange="updateReportStatus(${actualIndex}, this.value)">
+                            <option value="Pending" ${row.reportStatus === 'Pending' ? 'selected' : ''}>⏳ বাকি</option>
+                            <option value="Received" ${row.reportStatus === 'Received' ? 'selected' : ''}>✅ প্রাপ্ত</option>
+                            <option value="NotApplicable" ${row.reportStatus === 'NotApplicable' ? 'selected' : ''}>🚫 প্রযোজ্য নয়</option>
+                        </select>
+                        ${row.reportStatus === 'Received' ? `
+                            <div style="font-size:10px; font-weight:bold; margin-top:4px; text-align:center; color:var(--success);">
+                                📅 ${displayDate === 'নির্দিষ্ট নয়' ? 'আজ' : displayDate}
+                                <span style="text-decoration:underline; cursor:pointer; margin-left:4px; color:#1b365d;" onclick="openReportDateModal(${actualIndex})">[বদল]</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="mobile-field-group">
+                    <span class="mobile-field-label">কল লগ হিস্টোরি:</span>
+                    <div class="log-container" style="background:#fcfcfc;">${logsHtml || '<span style="color:#aaa;">কোনো লগ নেই</span>'}</div>
+                    <div class="edit-time-box" onclick="openTimeModal(${actualIndex})">🕒 ব্যাকডেট লগ যোগ করুন</div>
+                </div>
+                <div class="mobile-field-group" style="margin-bottom:0;">
+                    <span class="mobile-field-label">রিমার্কস ও লোকাল আলোচনা:</span>
+                    <textarea placeholder="এখানে মন্তব্য লিখুন..." oninput="autoExpandTextarea(this); syncRemarksOnInput(${actualIndex}, this.value)">${row.remarks || ''}</textarea>
+                </div>
+            `;
+            mCardsContainer.appendChild(card);
+        });
+
+        updateKPIs(filteredData.length);
+    }
+
+    function archiveCurrentEvent() {
+        if(!eventsData[activeEventId]) return;
+        if(!confirm("আপনি কি বর্তমান একটিভ ইভেন্টটি সম্পূর্ণ রেকর্ডসহ আর্কাইভ করতে চান?")) return;
+        let currentEvent = eventsData[activeEventId];
+        archives.push({
+            id: activeEventId, name: currentEvent.name, deadline: currentEvent.deadline,
+            archivedAt: new Date().toISOString(), tracking: currentEvent.tracking
+        });
+        localStorage.setItem('trackingArchives', JSON.stringify(archives));
+        deleteCurrentEventEntirely(true);
+        renderArchives();
+    }
+
+    function renderArchives() {
+        let container = document.getElementById('archiveContainer');
+        container.innerHTML = '';
+        if(archives.length === 0) {
+            container.innerHTML = '<p style="color:#718096; font-style: italic;">কোনো ইভেন্ট আর্কাইভ করা নেই।</p>';
+            return;
+        }
+        archives.forEach((arc, index) => {
+            let div = document.createElement('div');
+            div.style.cssText = "background:white; padding:10px; border-radius:6px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;";
+            div.innerHTML = `
+                <div>
+                    <strong>📁 ${arc.name}</strong> <span style="font-size:11px; color:#666;">(আর্কাইভ: ${getFormatedBengaliDate(arc.archivedAt)})</span>
+                </div>
+                <div class="flex-group">
+                    <button class="btn btn-outline btn-sm" onclick="restoreArchive(${index})">↺ রিস্টোর</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteArchivePermanently(${index})">❌ মুছুন</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function restoreArchive(index) {
+        let target = archives[index];
+        if(!confirm(`"${target.name}" ইভেন্টটি পুনরায় লাইভ সিস্টেমে রিস্টোর করতে চান?`)) return;
+        eventsData[target.id] = { name: target.name, deadline: target.deadline, tracking: target.tracking };
+        archives.splice(index, 1);
+        localStorage.setItem('trackingArchives', JSON.stringify(archives));
+        activeEventId = target.id;
+        saveEventsToStorage();
+        populateEventDropdown();
+        syncActiveEventFields();
+        renderTable();
+        renderArchives();
+    }
+
+    function deleteArchivePermanently(index) {
+        if(!confirm("আর্কাইভ করা এই ডাটাটি চিরতরে মুছে যাবে! আপনি কি নিশ্চিত?")) return;
+        archives.splice(index, 1);
+        localStorage.setItem('trackingArchives', JSON.stringify(archives));
+        renderArchives();
+    }
+
+    function resetCurrentEventFields() {
+        if(!eventsData[activeEventId]) return;
+        if(!confirm("চলতি ইভেন্টের সব জামাতের কল লগ, স্ট্যাটাস এবং রিমার্কস রিসেট করতে চান?")) return;
+        eventsData[activeEventId].tracking.forEach(row => {
+            row.logs = []; row.callStatus = 'Pending'; row.reportStatus = 'Pending'; row.receivedDate = ''; row.remarks = '';
+        });
+        saveEventsToStorage();
+        renderTable();
+    }
+
+    function deleteCurrentEventEntirely(silent = false) {
+        if(!eventsData[activeEventId]) return;
+        if(!silent && !confirm("এই ইভেন্টটি ডাটাবেজ থেকে চিরতরে ডিলিট হয়ে যাবে। নিশ্চিত?")) return;
+        delete eventsData[activeEventId];
+        let keys = Object.keys(eventsData);
+        if(keys.length === 0) {
+            activeEventId = "Evt_" + Date.now();
+            eventsData[activeEventId] = {
+                name: "নতুন ব্ল্যাংক ইভেন্ট", deadline: "",
+                tracking: myAssignedBranches.map(b => createBlankTrackingRow(b.id, b.jamat, b.contacts))
+            };
+        } else {
+            activeEventId = keys[0];
+        }
+        saveEventsToStorage();
+        populateEventDropdown();
+        syncActiveEventFields();
+        renderTable();
+    }
+
+    function exportBackup() {
+        let backupData = {
+            myAssignedBranches: myAssignedBranches, eventsData: eventsData,
+            archives: archives, nigranName: document.getElementById('nigranName').value
+        };
+        let blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = `Tracking_System_v4_2_1_Backup_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+    }
+
+    function importBackup(input) {
+        if(!input.files[0]) return;
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                let data = JSON.parse(e.target.result);
+                if(data.myAssignedBranches) {
+                    myAssignedBranches = data.myAssignedBranches;
+                    localStorage.setItem('myAssignedBranches', JSON.stringify(myAssignedBranches));
+                }
+                if(data.eventsData) {
+                    eventsData = data.eventsData;
+                    activeEventId = Object.keys(eventsData)[0];
+                    saveEventsToStorage();
+                }
+                if(data.archives) {
+                    archives = data.archives;
+                    localStorage.setItem('trackingArchives', JSON.stringify(archives));
+                }
+                if(data.nigranName) {
+                    document.getElementById('nigranName').value = data.nigranName;
+                    localStorage.setItem('nigranName', data.nigranName);
+                }
+                populateEventDropdown();
+                syncActiveEventFields();
+                renderTable();
+                renderArchives();
+                alert("ব্যাকআপ ফাইল সফলভাবে রিস্টোর হয়েছে!");
+            } catch(err) {
+                alert("ভুল ফাইল ফরম্যাট!");
+            }
+        };
+        reader.readAsText(input.files[0]);
+    }
+
+    function exportToCSV() {
+        if(!eventsData[activeEventId] || !eventsData[activeEventId].tracking) return;
+        let list = eventsData[activeEventId].tracking;
+        let csvContent = "\ufeffID,জামাতের নাম,কল স্ট্যাটাস,রিপোর্ট স্ট্যাটাস,রিপোর্ট প্রাপ্তির তারিখ,রিমার্কস\n";
+        list.forEach(row => {
+            let receivedDate = row.receivedDate || '-';
+            let remarks = (row.remarks || '').replace(/"/g, '""');
+            csvContent += `"${row.id}","${row.jamat}","${row.callStatus}","${row.reportStatus}","${receivedDate}","${remarks}"\n`;
+        });
+        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        let url = URL.createObjectURL(blob);
+        let link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Report_Export_${eventsData[activeEventId].name}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+</body>
+</html>
