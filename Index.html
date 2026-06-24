@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jama'at Phone Call & Report Tracking System v4.2.1</title>
+    <title>Jama'at Phone Call & Report Tracking System v4.2.2</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         :root {
             --primary: #1b365d;
@@ -244,7 +245,7 @@
 
 <div class="container">
     <h1>🕌 জামাত ফোন কল ও রিপোর্ট ট্র্যাকিং সিস্টেম</h1>
-    <div class="version-tag">Version 4.2.1 (Mobile Responsive)</div>
+    <div class="version-tag">Version 4.2.2 (Offline PWA)</div>
 
     <div class="accordion-header no-print" onclick="toggleAccordion()">
         <span>⚙️ ১. সিস্টেম কন্ট্রোল ও ডাটা ব্যাকআপ / ইমপোর্ট (এখানে ক্লিক করুন)</span>
@@ -300,7 +301,7 @@
             
             <label class="checkbox-container">
                 <input type="checkbox" id="isRecurringCheck" checked>
-                এটি আমার স্থায়ী/রিকারিং (Recurring) জামাতリスト
+                এটি আমার স্থায়ী/রিকারিং (Recurring) জামাত লিস্ট
             </label>
             
             <button class="btn btn-success" style="margin-top:15px; width: 100%;" onclick="generateMyList()">আমার নিগরানাধীন তালিকা ইনজেক্ট করুন</button>
@@ -657,7 +658,7 @@
             let contactsArr = [];
             if(p1P && row[p1P]) contactsArr.push(`• ${row[p1N] || 'সভাপতি'}: ${row[p1P]}`);
             if(p2P && row[p2P]) contactsArr.push(`• ${row[p2N] || 'অর্থ সম্পাদক'}: ${row[p2P]}`);
-            if(p3P && row[p3P]) contactsArr.push(`• ${row[p3N] || 'মুরুব্বী'}: ${row[p3P]}`);
+            if(p3P && row[p3P]) contactsArr.push(`• ${row[p3N] || 'مুরব্বী'}: ${row[p3P]}`);
             return { id: row[idIdx] || '', jamat: row[jamatIdx] || '', contacts: contactsArr.join('\n') };
         });
 
@@ -940,7 +941,7 @@
             `;
             tbody.appendChild(tr);
 
-            // 2. Build Mobile Responsive Card (Pure Bengali [বদল] Fixed Here)
+            // 2. Build Mobile Responsive Card
             let card = document.createElement('div');
             card.className = "mobile-card";
             card.innerHTML = `
@@ -1090,7 +1091,7 @@
         let url = URL.createObjectURL(blob);
         let a = document.createElement('a');
         a.href = url;
-        a.download = `Tracking_System_v4_2_1_Backup_${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `Tracking_System_v4_2_2_Backup_${new Date().toISOString().split('T')[0]}.json`;
         a.click();
     }
 
@@ -1148,6 +1149,16 @@
         link.click();
         document.body.removeChild(link);
     }
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker Registered Successfully!'))
+        .catch(err => console.log('Service Worker Registration Failed: ', err));
+    });
+  }
 </script>
 </body>
 </html>
