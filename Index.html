@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jama'at Phone Call & Report Tracking System v4.2.2</title>
+    <title>Jama'at Phone Call & Report Tracking System v4.2.3</title>
+    <!-- PWA Manifest Link -->
     <link rel="manifest" href="manifest.json">
     <style>
         :root {
@@ -180,7 +181,7 @@
         .print-status-text { display: none; font-weight: bold; font-size: 13px; text-align: center; width: 100%; }
         .print-remarks-text { display: none; font-size: 13.5px; line-height: 1.4; word-break: break-word; white-space: pre-line; }
 
-        /* 📱 Responsive Media Queries for Mobile Devices */
+        /* Responsive Media Queries for Mobile Devices */
         @media (max-width: 768px) {
             body { padding: 6px; }
             .container { padding: 10px; }
@@ -225,7 +226,7 @@
             .sticky-wrapper { position: relative; top: 0; box-shadow: none; border: 1px solid var(--border); background: var(--light); padding: 15px;}
             .sticky-divider { display: none; }
             .sticky-row:last-child { display: none !important; }
-            .table-responsive { display: block !important; } /* Always print table format */
+            .table-responsive { display: block !important; }
             .mobile-cards-container { display: none !important; }
             input, select, textarea { display: none !important; } 
             
@@ -245,13 +246,15 @@
 
 <div class="container">
     <h1>🕌 জামাত ফোন কল ও রিপোর্ট ট্র্যাকিং সিস্টেম</h1>
-    <div class="version-tag">Version 4.2.2 (Offline PWA)</div>
+    <div class="version-tag">Version 4.2.3 (Offline PWA)</div>
 
+    <!-- কলাপসিবল ব্যাকআপ মডিউল হেডার -->
     <div class="accordion-header no-print" onclick="toggleAccordion()">
         <span>⚙️ ১. সিস্টেম কন্ট্রোল ও ডাটা ব্যাকআপ / ইমপোর্ট (এখানে ক্লিক করুন)</span>
         <button class="btn btn-outline btn-sm" id="accordionBtn" style="background:white; border-color:#bdf1bd; color:#1e4620;">দেখুন 🔽</button>
     </div>
 
+    <!-- কলাপসিবল ব্যাকআপ মডিউল বডি -->
     <div class="accordion-content no-print" id="accordionContent">
         <div class="section-title" style="margin-bottom:15px;">
             <span>ডাটা ব্যাকআপ / ইমপোর্ট কন্ট্রোল প্যানেল</span>
@@ -353,6 +356,7 @@
         </div>
     </div>
 
+    <!-- ৫টি কেপিআই ড্যাশবোর্ড -->
     <div class="kpi-container">
         <div class="kpi-card">
             <div class="kpi-title" id="kpiTotalTitle">মোট / প্রযোজ্য জামাত</div>
@@ -380,6 +384,7 @@
         🖨️ প্রিন্ট ফিল্টার স্ট্যাটাস: <span id="pdfFilterName" style="color:#000;">সব জামাত</span> (<span id="pdfFilterCount" style="color:var(--success);">0</span> টি জামাত)
     </div>
 
+    <!-- ডেক্সটপ ভিউ টেবিল লেআউট -->
     <div class="section table-responsive" style="background: white; padding-top: 5px;">
         <table id="trackingTable">
             <thead>
@@ -401,8 +406,10 @@
         </table>
     </div>
 
+    <!-- মোবাইল ভিউ রেসপনসিভ কার্ড লেআউট -->
     <div class="mobile-cards-container" id="mobileCardsContent">
-        </div>
+        <!-- জাভাস্ক্রিপ্ট ডাইনামিকালি কার্ড ইনজেক্ট করবে -->
+    </div>
 
     <div class="section no-print" style="background: #fff5f5; border-color: #feb2b2; margin-top: 25px;">
         <div class="section-title" style="color: var(--danger); font-size:13px;">⚠️ ডেঞ্জার ও রিসেট জোন</div>
@@ -421,6 +428,7 @@
     </div>
 </div>
 
+<!-- কাস্টম কল লগ মডাল -->
 <div id="timePickerModal" class="modal-overlay no-print">
     <div class="modal-content">
         <h3>📅 কল করার কাস্টম সময় (১২ ঘণ্টা)</h3>
@@ -448,6 +456,7 @@
     </div>
 </div>
 
+<!-- রিপোর্ট ডেট মডাল -->
 <div id="reportDatePickerModal" class="modal-overlay no-print">
     <div class="modal-content">
         <h3>📅 রিপোর্ট রিসিভের কাস্টম তারিখ</h3>
@@ -469,6 +478,16 @@
     let currentEditingRowIndex = null; 
     let parsedHeaders = [];
     let parsedRows = [];
+
+    // স্বয়ংক্রিয়ভাবে জামাতের নাম A-Z অনুযায়ী সাজানোর হেলপার ফাংশন
+    function sortAlphabetically(arr) {
+        if(!arr || !Array.isArray(arr)) return [];
+        return arr.sort((a, b) => {
+            let nameA = (a.jamat || '').toString().trim();
+            let nameB = (b.jamat || '').toString().trim();
+            return nameA.localeCompare(nameB, 'bn', { sensitivity: 'base' });
+        });
+    }
 
     function toggleAccordion() {
         let content = document.getElementById('accordionContent');
@@ -504,12 +523,20 @@
         }
 
         if(localStorage.getItem('nigranName')) document.getElementById('nigranName').value = localStorage.getItem('nigranName');
-        if(localStorage.getItem('myAssignedBranches')) myAssignedBranches = JSON.parse(localStorage.getItem('myAssignedBranches'));
+        if(localStorage.getItem('myAssignedBranches')) {
+            myAssignedBranches = JSON.parse(localStorage.getItem('myAssignedBranches'));
+            sortAlphabetically(myAssignedBranches);
+        }
         if(localStorage.getItem('trackingArchives')) archives = JSON.parse(localStorage.getItem('trackingArchives'));
         
         if(localStorage.getItem('simultaneousEvents')) {
             eventsData = JSON.parse(localStorage.getItem('simultaneousEvents'));
             activeEventId = localStorage.getItem('activeEventId') || Object.keys(eventsData)[0];
+            
+            // সকল ইভেন্টের ডাটা A-Z হিসেবে সাজানো নিশ্চিতকরণ
+            Object.keys(eventsData).forEach(id => {
+                if(eventsData[id].tracking) sortAlphabetically(eventsData[id].tracking);
+            });
         }
 
         if(Object.keys(eventsData).length === 0) {
@@ -517,7 +544,7 @@
             eventsData[defaultId] = {
                 name: "কোয়ার্টারলি অডিট ও ফাইনান্সিয়াল রিপোর্ট কালেকশন",
                 deadline: "",
-                tracking: myAssignedBranches.map(b => createBlankTrackingRow(b.id, b.jamat, b.contacts))
+                tracking: sortAlphabetically(myAssignedBranches.map(b => createBlankTrackingRow(b.id, b.jamat, b.contacts)))
             };
             activeEventId = defaultId;
         }
@@ -599,7 +626,7 @@
         eventsData[newId] = {
             name: name.trim(),
             deadline: "",
-            tracking: myAssignedBranches.map(b => createBlankTrackingRow(b.id, b.jamat, b.contacts))
+            tracking: sortAlphabetically(myAssignedBranches.map(b => createBlankTrackingRow(b.id, b.jamat, b.contacts)))
         };
         saveEventsToStorage();
         populateEventDropdown();
@@ -662,6 +689,9 @@
             return { id: row[idIdx] || '', jamat: row[jamatIdx] || '', contacts: contactsArr.join('\n') };
         });
 
+        // A-Z সর্ট করা
+        sortAlphabetically(temporaryList);
+
         if (isRecurring) {
             myAssignedBranches = temporaryList;
             localStorage.setItem('myAssignedBranches', JSON.stringify(myAssignedBranches));
@@ -705,22 +735,25 @@
         el.style.height = el.scrollHeight + 'px';
     }
 
+    // নির্দিষ্ট ইনডেক্স ধরে রিমার্কস আপডেট (বাগ ফিক্স নিশ্চিত করা হয়েছে)
     function syncRemarksOnInput(index, value) {
+        if (!eventsData[activeEventId] || !eventsData[activeEventId].tracking[index]) return;
+        
         eventsData[activeEventId].tracking[index].remarks = value;
         saveEventsToStorage();
         
-        let dTable = document.getElementById('trackingTable');
-        if(dTable) {
-            let textareas = dTable.querySelectorAll('textarea');
-            if(textareas[index] && textareas[index].value !== value) textareas[index].value = value;
-            let divs = dTable.querySelectorAll('.print-remarks-text');
-            if(divs[index]) divs[index].innerText = value || '-';
-        }
-        let mContent = document.getElementById('mobileCardsContent');
-        if(mContent) {
-            let mTextareas = mContent.querySelectorAll('textarea');
-            if(mTextareas[index] && mTextareas[index].value !== value) mTextareas[index].value = value;
-        }
+        // ডেক্সটপ ও মোবাইলের সংশ্লিষ্ট রিমার্কস প্রিন্ট ডিভ আপডেট
+        let printDivs = document.querySelectorAll(`.print-remarks-[data-idx="${index}"]`);
+        printDivs.forEach(div => {
+            div.innerText = value || '-';
+        });
+
+        // সিঙ্ক করার সময় টেক্সট-এরিয়ার ক্রস-বাইন্ডিং রিমুভ
+        let desktopTextarea = document.querySelector(`textarea.desktop-remarks[data-idx="${index}"]`);
+        let mobileTextarea = document.querySelector(`textarea.mobile-remarks[data-idx="${index}"]`);
+
+        if (desktopTextarea && desktopTextarea.value !== value) desktopTextarea.value = value;
+        if (mobileTextarea && mobileTextarea.value !== value) mobileTextarea.value = value;
     }
 
     function updateCallStatus(index, status) {
@@ -874,6 +907,8 @@
             return;
         }
 
+        // নিশ্চিত করা হলো ডাটাসকল রেন্ডার হওয়ার পূর্বে A-Z সাজানো আছে
+        sortAlphabetically(eventsData[activeEventId].tracking);
         let activeTrackingList = eventsData[activeEventId].tracking;
         let todayStringBengali = new Date().toLocaleDateString('bn-BD');
 
@@ -892,7 +927,7 @@
         });
 
         filteredData.forEach((row) => {
-            let actualIndex = activeTrackingList.findIndex(b => b.id === row.id);
+            let actualIndex = activeTrackingList.findIndex(b => b.id === row.id && b.jamat === row.jamat);
             let logsHtml = row.logs.map(l => `<div class="log-item">${l}</div>`).join('');
             let displayDate = row.receivedDate ? getFormatedBengaliDate(row.receivedDate) : '';
             
@@ -935,8 +970,8 @@
                     ` : ''}
                 </td>
                 <td>
-                    <textarea class="no-print" oninput="autoExpandTextarea(this); syncRemarksOnInput(${actualIndex}, this.value)">${row.remarks || ''}</textarea>
-                    <div class="print-remarks-text">${row.remarks || '-'}</div>
+                    <textarea class="no-print desktop-remarks" data-idx="${actualIndex}" oninput="autoExpandTextarea(this); syncRemarksOnInput(${actualIndex}, this.value)">${row.remarks || ''}</textarea>
+                    <div class="print-remarks-text print-remarks-[data-idx='${actualIndex}']">${row.remarks || '-'}</div>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -986,7 +1021,7 @@
                 </div>
                 <div class="mobile-field-group" style="margin-bottom:0;">
                     <span class="mobile-field-label">রিমার্কস ও লোকাল আলোচনা:</span>
-                    <textarea placeholder="এখানে মন্তব্য লিখুন..." oninput="autoExpandTextarea(this); syncRemarksOnInput(${actualIndex}, this.value)">${row.remarks || ''}</textarea>
+                    <textarea class="mobile-remarks" data-idx="${actualIndex}" placeholder="এখানে মন্তব্য লিখুন..." oninput="autoExpandTextarea(this); syncRemarksOnInput(${actualIndex}, this.value)">${row.remarks || ''}</textarea>
                 </div>
             `;
             mCardsContainer.appendChild(card);
@@ -1034,7 +1069,7 @@
     function restoreArchive(index) {
         let target = archives[index];
         if(!confirm(`"${target.name}" ইভেন্টটি পুনরায় লাইভ সিস্টেমে রিস্টোর করতে চান?`)) return;
-        eventsData[target.id] = { name: target.name, deadline: target.deadline, tracking: target.tracking };
+        eventsData[target.id] = { name: target.name, deadline: target.deadline, tracking: sortAlphabetically(target.tracking) };
         archives.splice(index, 1);
         localStorage.setItem('trackingArchives', JSON.stringify(archives));
         activeEventId = target.id;
@@ -1071,7 +1106,7 @@
             activeEventId = "Evt_" + Date.now();
             eventsData[activeEventId] = {
                 name: "নতুন ব্ল্যাংক ইভেন্ট", deadline: "",
-                tracking: myAssignedBranches.map(b => createBlankTrackingRow(b.id, b.jamat, b.contacts))
+                tracking: sortAlphabetically(myAssignedBranches.map(b => createBlankTrackingRow(b.id, b.jamat, b.contacts)))
             };
         } else {
             activeEventId = keys[0];
@@ -1091,7 +1126,7 @@
         let url = URL.createObjectURL(blob);
         let a = document.createElement('a');
         a.href = url;
-        a.download = `Tracking_System_v4_2_2_Backup_${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `Tracking_System_v4_2_3_Backup_${new Date().toISOString().split('T')[0]}.json`;
         a.click();
     }
 
@@ -1102,11 +1137,14 @@
             try {
                 let data = JSON.parse(e.target.result);
                 if(data.myAssignedBranches) {
-                    myAssignedBranches = data.myAssignedBranches;
+                    myAssignedBranches = sortAlphabetically(data.myAssignedBranches);
                     localStorage.setItem('myAssignedBranches', JSON.stringify(myAssignedBranches));
                 }
                 if(data.eventsData) {
                     eventsData = data.eventsData;
+                    Object.keys(eventsData).forEach(id => {
+                        if(eventsData[id].tracking) sortAlphabetically(eventsData[id].tracking);
+                    });
                     activeEventId = Object.keys(eventsData)[0];
                     saveEventsToStorage();
                 }
@@ -1151,6 +1189,7 @@
     }
 </script>
 
+<!-- Service Worker Registration Script -->
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
